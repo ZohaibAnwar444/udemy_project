@@ -9,6 +9,9 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\User;
+use app\models\Mailer as UdemyMailer;
+use yii\web\NotFoundHttpException;
 
 class SiteController extends Controller
 {
@@ -61,6 +64,7 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        // Yii::$app->language = 'de-DE';
         return $this->render('index');
     }
 
@@ -84,6 +88,32 @@ class SiteController extends Controller
         return $this->render('login', [
             'model' => $model,
         ]);
+    }
+    public function actionRegister()
+    {
+        if (!Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+        $newUser = new User();
+        if ($newUser->load(Yii::$app->request->post()) && $newUser->save() && UdemyMailer:: send(UdemyMailer::TYPE_REGISTERATION, $newUser)) {
+            Yii::$app->session->setFlash('success','SuccessFully Registered, please check email');
+            return $this->goBack();
+        }
+       return $this->render('register',[
+        'newUser' => $newUser,
+       ]) ;
+    }
+    public function actionActivate($user,$token){
+        $userActivation = User::find()->where(['id' => $user, 'uid' => $token])->one();
+        if(empty($userActivation)){
+            throw new NotFoundHttpException('user not found');
+        }
+        if(!$userActivation->activate()){
+            Yii::$app->session->setFlash('error','Can not activated');
+        }else{
+            Yii::$app->session->setFlash('success','SuccessFully activated');
+        }
+        return $this->goBack();
     }
 
     /**

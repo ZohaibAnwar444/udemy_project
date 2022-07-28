@@ -43,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php ActiveForm::end(); ?>
 
     <div class="offset-lg-1" style="color:#999;">
-        You may login with <strong>admin/admin</strong> or <strong>demo/demo</strong>.<br>
-        To modify the username/password, please check out the code <code>app\models\User::$users</code>.
+     If you don't have an account <strong>Register</strong>
+     <a href="/udemy/web/index.php/site/register">SignUp</a>
     </div>
 </div>

@@ -2,12 +2,20 @@
 
 /** @var yii\web\View $this */
 
+use app\components\LanguageDropdown;
+
 $this->title = 'My Yii Application';
 ?>
 <div class="site-index">
+<!-- <div class="dropdown">
+    <a href="#" data-toggle="dropdown" class="dropdown-toggle">Language <b class="caret"></b></a>
+    <?php
+        echo LanguageDropdown::widget();
+    ?>
+</div> -->
 
     <div class="jumbotron text-center bg-transparent">
-        <h1 class="display-4">Congratulations!!!!</h1>
+        <h1 class="display-4"><?php echo Yii::t('app','Congratulations') ?><?php echo '{'.Yii::$app->language.'}'?></h1>
 
         <p class="lead">You have successfully created your Yii-powered application.</p>
 

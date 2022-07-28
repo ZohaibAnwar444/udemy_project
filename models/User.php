@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use phpDocumentor\Reflection\Types\Expression;
 use Yii;
 
 /**
@@ -27,6 +28,9 @@ use Yii;
  */
 class User extends \yii\db\ActiveRecord
 {
+    const STATUS_INSERTED = 0;
+    const STATUS_ACTIVE = 1;
+    const STATUS_BLOCKED = 2;
     /**
      * {@inheritdoc}
      */
@@ -43,6 +47,7 @@ class User extends \yii\db\ActiveRecord
         return [
             [['uid', 'username', 'email', 'password', 'auth_key'], 'required'],
             [['status', 'contact_email', 'contact_phone'], 'integer'],
+            [['email'], 'email'],
             [['created', 'updated'], 'safe'],
             [['uid', 'password', 'auth_key'], 'string', 'max' => 60],
             [['username'], 'string', 'max' => 45],
@@ -53,6 +58,32 @@ class User extends \yii\db\ActiveRecord
         ];
     }
 
+    public function beforeValidate()
+    {
+        if($this->isNewRecord){
+            $this->setUid();
+            $this->setAuth_Key();
+        }
+      
+        return parent::beforeValidate();
+    }
+    public function beforeSave($insert)
+    {
+        $this->password = Yii::$app->getSecurity()->generatePasswordHash($this->password);
+        return parent::beforeSave($insert);
+    }
+   
+    private function setUid(){
+        $this-> uid = Yii::$app->getSecurity()->generatePasswordHash(date('YmdHis'). rand(1,999999));
+    }
+    private function setAuth_Key(){
+        $this->auth_key = Yii::$app->getSecurity()->generatePasswordHash(date('YmdHis').rand(1,999999));
+    }
+    public function activate(){
+        $this->status = self::STATUS_ACTIVE;
+        $this->setUid();
+        return $this->save();
+    }
     /**
      * {@inheritdoc}
      */
